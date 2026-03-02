@@ -2,6 +2,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
-  "installCommand": "npm install --force",
-  "nodeVersion": "20.x"
+  "installCommand": "npm install --force"
+
 }
