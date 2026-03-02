@@ -1,17 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Menu, X, Droplets, Fish, Phone, Mail, MapPin, ChevronDown, Star, CheckCircle, ArrowRight, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+import { Menu, X, Droplets, Fish, Phone, Mail, MapPin, ChevronDown, Star, CheckCircle, ArrowRight, MessageCircle, Send } from 'lucide-react';
 
+// Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
+
+// WhatsApp configuration
+const WHATSAPP_NUMBER = '+2348109598706'; // Replace with your actual WhatsApp number
+const WHATSAPP_MESSAGE_TEMPLATE = (data: {
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+}) => {
+  return `*New Inquiry from DejiOlanike Farm Website*%0A%0A
+*Name:* ${data.name}%0A
+*Phone:* ${data.phone}%0A
+*Email:* ${data.email || 'Not provided'}%0A
+*Message:* ${data.message}%0A%0A
+_Sent from website contact form_`;
+};
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: ''
+  });
+
+  // Refs for sections
   const heroRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const productsRef = useRef<HTMLDivElement>(null);
@@ -85,9 +109,66 @@ function App() {
     setIsMenuOpen(false);
   };
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Validate phone number (basic Nigerian format)
+  const validatePhoneNumber = (phone: string) => {
+    const phoneRegex = /^(\+?234|0)[789][01]\d{8}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+  };
+
+  // Handle WhatsApp form submission
+  const handleWhatsAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Message sent successfully! We will get back to you soon.');
+    
+    if (!formData.name.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.phone)) {
+      alert('Please enter a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)');
+      return;
+    }
+
+    if (!formData.message.trim()) {
+      alert('Please enter your message');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const message = WHATSAPP_MESSAGE_TEMPLATE(formData);
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+      
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        message: ''
+      });
+      
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle quick WhatsApp inquiry
+  const handleQuickInquiry = (productName: string) => {
+    const message = `I'm interested in your *${productName}*. Please provide more information.`;
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   const navLinks = [
@@ -102,73 +183,77 @@ function App() {
   return (
     <div className="min-h-screen bg-[#F4FBF9]">
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-[#2EC4B6] flex items-center justify-center">
                 <Fish className="w-5 h-5 text-white" />
               </div>
-              <span className={`font-heading font-bold text-lg lg:text-xl ${isScrolled ? 'text-[#0B3C3C]' : 'text-[#0B3C3C]'}`}>
+              <span className="font-bold text-lg lg:text-xl text-[#0B3C3C]">
                 DejiOlanike Farm
               </span>
             </div>
 
-            {/* Desktop Nav */}
+            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <button
                   key={link.label}
                   onClick={() => scrollToSection(link.ref)}
-                  className={`font-medium text-sm hover:text-[#2EC4B6] transition-colors ${isScrolled ? 'text-[#3A5A5A]' : 'text-[#3A5A5A]'}`}
+                  className="font-medium text-sm text-[#3A5A5A] hover:text-[#2EC4B6] transition-colors"
                 >
                   {link.label}
                 </button>
               ))}
-              <Button
+              <button
                 onClick={() => scrollToSection(contactRef)}
-                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl px-6"
+                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-6 py-2 rounded-xl font-medium transition-colors"
               >
                 Order Fingerlings
-              </Button>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-[#2EC4B6]/10 transition-colors"
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="w-6 h-6 text-[#0B3C3C]" /> : <Menu className="w-6 h-6 text-[#0B3C3C]" />}
             </button>
           </div>
-        </div>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-[#E6F6F2]">
-            <div className="px-4 py-4 space-y-2">
-              {navLinks.map((link) => (
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="lg:hidden mt-4 bg-white rounded-xl shadow-lg border border-[#E6F6F2] overflow-hidden">
+              <div className="p-4 space-y-2">
+                {navLinks.map((link) => (
+                  <button
+                    key={link.label}
+                    onClick={() => scrollToSection(link.ref)}
+                    className="block w-full text-left px-4 py-3 rounded-lg text-[#3A5A5A] hover:bg-[#E6F6F2] transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                ))}
                 <button
-                  key={link.label}
-                  onClick={() => scrollToSection(link.ref)}
-                  className="block w-full text-left px-4 py-3 rounded-xl text-[#3A5A5A] hover:bg-[#E6F6F2] hover:text-[#0B3C3C] transition-colors font-medium"
+                  onClick={() => scrollToSection(contactRef)}
+                  className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-4 py-3 rounded-lg font-medium transition-colors mt-2"
                 >
-                  {link.label}
+                  Order Fingerlings
                 </button>
-              ))}
-              <Button
-                onClick={() => scrollToSection(contactRef)}
-                className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl mt-4"
-              >
-                Order Fingerlings
-              </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         <div className="hero-bg absolute inset-0">
           <img
             src="/images/hero_pond.jpg"
@@ -178,8 +263,8 @@ function App() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#F4FBF9]/40 via-[#F4FBF9]/60 to-[#F4FBF9]/90" />
         </div>
 
-        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pt-20">
-          <h1 className="hero-title font-heading font-extrabold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-[#0B3C3C] leading-tight mb-6">
+        <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+          <h1 className="hero-title font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-[#0B3C3C] leading-tight mb-6">
             <span className="inline-block">Fresh</span>{' '}
             <span className="inline-block">&</span>{' '}
             <span className="inline-block">Healthy</span>{' '}
@@ -193,21 +278,18 @@ function App() {
             Reliable supply for farmers, businesses, and households—delivered with care.
           </p>
           <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
+            <button
               onClick={() => scrollToSection(contactRef)}
-              size="lg"
-              className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl px-8 py-6 text-lg font-semibold shadow-lg shadow-[#2EC4B6]/25"
+              className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-[#2EC4B6]/25 transition-colors"
             >
               Order Fingerlings
-            </Button>
-            <Button
+            </button>
+            <button
               onClick={() => scrollToSection(contactRef)}
-              size="lg"
-              variant="outline"
-              className="border-2 border-[#0B3C3C] text-[#0B3C3C] hover:bg-[#0B3C3C] hover:text-white rounded-xl px-8 py-6 text-lg font-semibold"
+              className="border-2 border-[#0B3C3C] text-[#0B3C3C] hover:bg-[#0B3C3C] hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-colors"
             >
               Contact Us
-            </Button>
+            </button>
           </div>
         </div>
 
@@ -222,8 +304,8 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="about-animate order-2 lg:order-1">
-              <span className="font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">About Us</span>
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
+              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">About Us</span>
+              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
                 We raise strong fingerlings with care and clean water.
               </h2>
               <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
@@ -239,15 +321,15 @@ function App() {
               </ul>
             </div>
             <div className="about-animate relative order-1 lg:order-2">
-              <div className="relative rounded-[28px] overflow-hidden shadow-xl">
+              <div className="relative rounded-[28px] overflow-hidden shadow-xl h-[400px] lg:h-[500px]">
                 <img
                   src="/images/about_farm.jpg"
                   alt="Holding a fingerling"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg animate-float">
-                <span className="font-heading font-bold text-3xl lg:text-4xl">10K+</span>
+              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
+                <span className="font-bold text-3xl lg:text-4xl">10K+</span>
                 <span className="text-sm font-medium text-center px-2">Fingerlings supplied</span>
               </div>
             </div>
@@ -259,12 +341,15 @@ function App() {
       <section ref={productsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="product-animate font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Our Products</span>
-            <h2 className="product-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
+            <span className="product-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Our Products</span>
+            <h2 className="product-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
               Everything you need to start or restock your farm.
             </h2>
-            <button className="product-animate inline-flex items-center gap-2 text-[#2EC4B6] font-semibold hover:gap-3 transition-all">
-              View full catalog <ArrowRight className="w-4 h-4" />
+            <button 
+              onClick={() => handleQuickInquiry('Full Product Catalog')}
+              className="product-animate inline-flex items-center gap-2 text-[#2EC4B6] font-semibold hover:gap-3 transition-all"
+            >
+              View full catalog on WhatsApp <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -298,15 +383,15 @@ function App() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-heading font-bold text-xl text-[#0B3C3C] mb-2">{product.title}</h3>
+                  <h3 className="font-bold text-xl text-[#0B3C3C] mb-2">{product.title}</h3>
                   <p className="text-[#3A5A5A] mb-4">{product.description}</p>
-                  <Button
-                    onClick={() => scrollToSection(contactRef)}
-                    variant="outline"
-                    className="w-full border-[#2EC4B6] text-[#2EC4B6] hover:bg-[#2EC4B6] hover:text-white rounded-xl"
+                  <button
+                    onClick={() => handleQuickInquiry(product.title)}
+                    className="w-full border-2 border-[#2EC4B6] text-[#2EC4B6] hover:bg-[#2EC4B6] hover:text-white px-4 py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
-                    Inquire Now
-                  </Button>
+                    <Send className="w-4 h-4" />
+                    Inquire on WhatsApp
+                  </button>
                 </div>
               </div>
             ))}
@@ -319,21 +404,21 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="why-animate relative">
-              <div className="relative rounded-[28px] overflow-hidden shadow-xl">
+              <div className="relative rounded-[28px] overflow-hidden shadow-xl h-[400px] lg:h-[500px]">
                 <img
                   src="/images/why_pond.jpg"
                   alt="Farm pond"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#0B3C3C] flex flex-col items-center justify-center text-white shadow-lg animate-float" style={{ animationDelay: '1s' }}>
-                <span className="font-heading font-bold text-3xl lg:text-4xl">100%</span>
+              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#0B3C3C] flex flex-col items-center justify-center text-white shadow-lg">
+                <span className="font-bold text-3xl lg:text-4xl">100%</span>
                 <span className="text-sm font-medium text-center px-2">Healthy Stock Guarantee</span>
               </div>
             </div>
             <div className="why-animate">
-              <span className="font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Why Choose Us</span>
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
+              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Why Choose Us</span>
+              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
                 Healthy stock. Honest service. Reliable delivery.
               </h2>
               <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
@@ -363,8 +448,8 @@ function App() {
       <section ref={stepsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="step-animate font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">How to Order</span>
-            <h2 className="step-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
+            <span className="step-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">How to Order</span>
+            <h2 className="step-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
               Get quality fingerlings in three simple steps.
             </h2>
           </div>
@@ -394,14 +479,14 @@ function App() {
                 key={i}
                 className="step-animate relative bg-white rounded-[28px] p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
               >
-                <div className="absolute top-4 right-4 text-8xl font-heading font-bold text-[#2EC4B6]/10 leading-none">
+                <div className="absolute top-4 right-4 text-8xl font-bold text-[#2EC4B6]/10 leading-none">
                   {item.step}
                 </div>
                 <div className="relative">
                   <div className="w-14 h-14 rounded-2xl bg-[#2EC4B6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                     <item.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-heading font-bold text-xl text-[#0B3C3C] mb-3">{item.title}</h3>
+                  <h3 className="font-bold text-xl text-[#0B3C3C] mb-3">{item.title}</h3>
                   <p className="text-[#3A5A5A]">{item.description}</p>
                 </div>
               </div>
@@ -415,8 +500,8 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="testimonial-animate">
-              <span className="font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Testimonials</span>
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-8">
+              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Testimonials</span>
+              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-8">
                 Farmers trust us because the results speak.
               </h2>
               <div className="bg-white rounded-[28px] p-8 shadow-lg relative">
@@ -426,7 +511,7 @@ function App() {
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-[#E6F6F2] flex items-center justify-center">
-                    <span className="font-heading font-bold text-[#2EC4B6]">A</span>
+                    <span className="font-bold text-[#2EC4B6]">A</span>
                   </div>
                   <div>
                     <p className="font-semibold text-[#0B3C3C]">A satisfied customer</p>
@@ -436,17 +521,17 @@ function App() {
               </div>
             </div>
             <div className="testimonial-animate relative">
-              <div className="relative rounded-[28px] overflow-hidden shadow-xl">
+              <div className="relative rounded-[28px] overflow-hidden shadow-xl h-[400px] lg:h-[500px]">
                 <img
                   src="/images/testimonial_fish.jpg"
                   alt="Healthy fingerlings"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg animate-float" style={{ animationDelay: '0.5s' }}>
+              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
                 <div className="flex items-center gap-1">
                   <Star className="w-5 h-5 fill-current" />
-                  <span className="font-heading font-bold text-2xl lg:text-3xl">4.9</span>
+                  <span className="font-bold text-2xl lg:text-3xl">4.9</span>
                 </div>
                 <span className="text-sm font-medium">Average rating</span>
               </div>
@@ -459,32 +544,32 @@ function App() {
       <section ref={galleryRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="gallery-animate font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Gallery</span>
-            <h2 className="gallery-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
+            <span className="gallery-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Gallery</span>
+            <h2 className="gallery-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
               A look at life on the farm.
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { image: '/images/gallery_01.jpg', caption: 'Morning pond check' },
-              { image: '/images/gallery_02.jpg', caption: 'Clean water, healthy fish' },
-              { image: '/images/gallery_03.jpg', caption: 'Careful handling' },
-              { image: '/images/gallery_04.jpg', caption: 'Sorting for delivery' },
-              { image: '/images/gallery_05.jpg', caption: 'Packaging for transport' },
-              { image: '/images/gallery_06.jpg', caption: 'Ready for stocking' },
-            ].map((item, i) => (
+              '/images/gallery_01.jpg',
+              '/images/gallery_02.jpg',
+              '/images/gallery_03.jpg',
+              '/images/gallery_04.jpg',
+              '/images/gallery_05.jpg',
+              '/images/gallery_06.jpg',
+            ].map((image, i) => (
               <div
                 key={i}
-                className="gallery-animate group relative rounded-[20px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                className="gallery-animate group relative rounded-[20px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] h-64"
               >
                 <img
-                  src={item.image}
-                  alt={item.caption}
-                  className="w-full h-64 object-cover"
+                  src={image}
+                  alt={`Gallery ${i + 1}`}
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B3C3C]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <p className="text-white font-medium p-4">{item.caption}</p>
+                  <p className="text-white font-medium p-4">Farm Life</p>
                 </div>
               </div>
             ))}
@@ -497,60 +582,89 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="contact-animate relative">
-              <div className="relative rounded-[28px] overflow-hidden shadow-xl">
+              <div className="relative rounded-[28px] overflow-hidden shadow-xl h-[400px] lg:h-[500px]">
                 <img
                   src="/images/contact_pond.jpg"
                   alt="Serene farm pond"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg animate-float" style={{ animationDelay: '1.5s' }}>
+              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
                 <MessageCircle className="w-8 h-8 mb-1" />
-                <span className="font-heading font-bold text-lg">Let's Talk</span>
+                <span className="font-bold text-lg">Quick Response</span>
               </div>
             </div>
             <div className="contact-animate">
-              <span className="font-label font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Contact Us</span>
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
+              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Contact Us</span>
+              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
                 Let's talk fish.
               </h2>
               <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
-                Ask about availability, pricing, or farm support. We reply quickly.
+                Ask about availability, pricing, or farm support. We reply quickly on WhatsApp.
               </p>
 
-              <form onSubmit={handleContactSubmit} className="space-y-4">
+              <form onSubmit={handleWhatsAppSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <Input
-                    placeholder="Your Name"
-                    className="bg-white border-[#E6F6F2] rounded-xl h-12 focus:ring-[#2EC4B6] focus:border-[#2EC4B6]"
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    placeholder="Your Name *"
+                    className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
                     required
                   />
-                  <Input
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
                     type="tel"
-                    placeholder="Phone Number"
-                    className="bg-white border-[#E6F6F2] rounded-xl h-12 focus:ring-[#2EC4B6] focus:border-[#2EC4B6]"
+                    placeholder="Phone Number *"
+                    className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
                     required
                   />
                 </div>
-                <Input
+                <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   type="email"
-                  placeholder="Email Address"
-                  className="bg-white border-[#E6F6F2] rounded-xl h-12 focus:ring-[#2EC4B6] focus:border-[#2EC4B6]"
+                  placeholder="Email Address (optional)"
+                  className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
                 />
-                <Textarea
-                  placeholder="Your Message"
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  placeholder="Your Message *"
                   rows={4}
-                  className="bg-white border-[#E6F6F2] rounded-xl resize-none focus:ring-[#2EC4B6] focus:border-[#2EC4B6]"
+                  className="w-full bg-white border border-[#E6F6F2] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent resize-none"
                   required
                 />
-                <Button
+                <button
                   type="submit"
-                  size="lg"
-                  className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl h-14 text-lg font-semibold"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl h-14 text-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
-                  Send Message
-                </Button>
+                  {isSubmitting ? (
+                    <>Processing...</>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5" />
+                      Send via WhatsApp
+                    </>
+                  )}
+                </button>
               </form>
+
+              <div className="mt-6">
+                <button
+                  onClick={() => handleQuickInquiry('general inquiry')}
+                  className="w-full border-2 border-[#25D366] text-[#25D366] hover:bg-[#25D366] hover:text-white rounded-xl h-12 flex items-center justify-center gap-2 transition-colors"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Chat directly on WhatsApp
+                </button>
+              </div>
 
               <div className="mt-8 pt-8 border-t border-[#E6F6F2] space-y-3">
                 <div className="flex items-center gap-3 text-[#3A5A5A]">
@@ -575,12 +689,12 @@ function App() {
       <footer className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0B3C3C]">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-            <div className="lg:col-span-1">
+            <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 rounded-full bg-[#2EC4B6] flex items-center justify-center">
                   <Fish className="w-5 h-5 text-white" />
                 </div>
-                <span className="font-heading font-bold text-xl text-white">
+                <span className="font-bold text-xl text-white">
                   DejiOlanike Farm
                 </span>
               </div>
@@ -590,12 +704,12 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-heading font-bold text-white mb-4">Products</h4>
+              <h4 className="font-bold text-white mb-4">Products</h4>
               <ul className="space-y-2">
                 {['Fingerlings', 'Table-size Fish', 'Supplies'].map((item) => (
                   <li key={item}>
                     <button
-                      onClick={() => scrollToSection(productsRef)}
+                      onClick={() => handleQuickInquiry(item)}
                       className="text-[#E6F6F2]/80 hover:text-[#2EC4B6] transition-colors"
                     >
                       {item}
@@ -606,19 +720,19 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-heading font-bold text-white mb-4">Company</h4>
+              <h4 className="font-bold text-white mb-4">Company</h4>
               <ul className="space-y-2">
-                {[
-                  { label: 'About', ref: aboutRef },
-                  { label: 'Gallery', ref: galleryRef },
-                  { label: 'Contact', ref: contactRef },
-                ].map((item) => (
-                  <li key={item.label}>
+                {['About', 'Gallery', 'Contact'].map((item) => (
+                  <li key={item}>
                     <button
-                      onClick={() => scrollToSection(item.ref)}
+                      onClick={() => {
+                        if (item === 'About') scrollToSection(aboutRef);
+                        if (item === 'Gallery') scrollToSection(galleryRef);
+                        if (item === 'Contact') scrollToSection(contactRef);
+                      }}
                       className="text-[#E6F6F2]/80 hover:text-[#2EC4B6] transition-colors"
                     >
-                      {item.label}
+                      {item}
                     </button>
                   </li>
                 ))}
@@ -626,14 +740,15 @@ function App() {
             </div>
 
             <div>
-              <h4 className="font-heading font-bold text-white mb-4">Get Started</h4>
+              <h4 className="font-bold text-white mb-4">Get Started</h4>
               <p className="text-[#E6F6F2]/80 mb-4">Ready to order quality fingerlings?</p>
-              <Button
-                onClick={() => scrollToSection(contactRef)}
-                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl"
+              <button
+                onClick={() => handleQuickInquiry('fingerlings order')}
+                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-colors"
               >
-                Order Fingerlings
-              </Button>
+                <Send className="w-4 h-4" />
+                Order on WhatsApp
+              </button>
             </div>
           </div>
 
@@ -645,6 +760,7 @@ function App() {
               {['WhatsApp', 'Facebook', 'Instagram'].map((social) => (
                 <button
                   key={social}
+                  onClick={() => social === 'WhatsApp' && handleQuickInquiry('connect on social media')}
                   className="text-[#E6F6F2]/60 hover:text-[#2EC4B6] text-sm transition-colors"
                 >
                   {social}
