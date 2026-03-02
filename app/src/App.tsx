@@ -2,32 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Menu, X, Droplets, Fish, Phone, Mail, MapPin, ChevronDown, Star, CheckCircle, ArrowRight, MessageCircle, Send } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
-// WhatsApp configuration
-const WHATSAPP_NUMBER = '+2348109598706'; // Replace with your actual WhatsApp number
-const WHATSAPP_MESSAGE_TEMPLATE = (data: {
-  name: string;
-  phone: string;
-  email: string;
-  message: string;
-}) => {
-  return `*New Inquiry from DejiOlanike Farm Website*%0A%0A
-*Name:* ${data.name}%0A
-*Phone:* ${data.phone}%0A
-*Email:* ${data.email || 'Not provided'}%0A
-*Message:* ${data.message}%0A%0A
-_Sent from website contact form_`;
-};
+const WHATSAPP_NUMBER = '+2348109598706'; // Replace with your actual number
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   
-  // Form state
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -35,7 +21,7 @@ function App() {
     message: ''
   });
 
-  // Refs for sections
+  // Refs
   const heroRef = useRef<HTMLDivElement>(null);
   const aboutRef = useRef<HTMLDivElement>(null);
   const productsRef = useRef<HTMLDivElement>(null);
@@ -45,6 +31,33 @@ function App() {
   const galleryRef = useRef<HTMLDivElement>(null);
   const contactRef = useRef<HTMLDivElement>(null);
 
+  // Preload critical images
+  useEffect(() => {
+    const criticalImages = [
+      '/images/hero_pond.jpg',
+      '/images/about_farm.jpg',
+    ];
+    
+    let loaded = 0;
+    criticalImages.forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        loaded++;
+        if (loaded === criticalImages.length) {
+          setImagesLoaded(true);
+        }
+      };
+      img.onerror = () => {
+        loaded++;
+        if (loaded === criticalImages.length) {
+          setImagesLoaded(true);
+        }
+      };
+      img.src = src;
+    });
+  }, []);
+
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -53,8 +66,11 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Animations
   useEffect(() => {
-    // Hero entrance animation
+    if (!imagesLoaded) return;
+
+    // Hero animation
     const heroTl = gsap.timeline({ delay: 0.3 });
     heroTl
       .fromTo('.hero-bg', { scale: 1.08, opacity: 0 }, { scale: 1, opacity: 1, duration: 1, ease: 'power2.out' })
@@ -63,10 +79,9 @@ function App() {
       .fromTo('.hero-cta', { y: 18, scale: 0.98, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.3')
       .fromTo('.scroll-hint', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2');
 
-    // Scroll hint animation
     gsap.to('.scroll-hint', { y: 8, duration: 1.6, repeat: -1, yoyo: true, ease: 'sine.inOut' });
 
-    // Setup scroll animations for sections
+    // Section animations
     const sections = [
       { ref: aboutRef, class: '.about-animate' },
       { ref: productsRef, class: '.product-animate' },
@@ -99,76 +114,74 @@ function App() {
       }
     });
 
+    ScrollTrigger.refresh();
+
     return () => {
       ScrollTrigger.getAll().forEach(st => st.kill());
     };
-  }, []);
+  }, [imagesLoaded]);
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
     setIsMenuOpen(false);
   };
 
-  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Validate phone number (basic Nigerian format)
   const validatePhoneNumber = (phone: string) => {
     const phoneRegex = /^(\+?234|0)[789][01]\d{8}$/;
     return phoneRegex.test(phone.replace(/\s/g, ''));
   };
 
-  // Handle WhatsApp form submission
   const handleWhatsAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      alert('Please enter your name');
+      toast.error('Please enter your name');
       return;
     }
 
     if (!validatePhoneNumber(formData.phone)) {
-      alert('Please enter a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)');
+      toast.error('Please enter a valid Nigerian phone number (e.g., 08012345678)');
       return;
     }
 
     if (!formData.message.trim()) {
-      alert('Please enter your message');
+      toast.error('Please enter your message');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const message = WHATSAPP_MESSAGE_TEMPLATE(formData);
+      const message = `*New Inquiry from DejiOlanike Farm Website*%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Email:* ${formData.email || 'Not provided'}%0A*Message:* ${formData.message}`;
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${message}`;
       window.open(whatsappUrl, '_blank');
       
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        message: ''
-      });
+      toast.success('Redirecting to WhatsApp...');
       
+      setFormData({ name: '', phone: '', email: '', message: '' });
     } catch (error) {
-      alert('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle quick WhatsApp inquiry
   const handleQuickInquiry = (productName: string) => {
     const message = `I'm interested in your *${productName}*. Please provide more information.`;
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER.replace(/\+/g, '')}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
+    toast.success('Opening WhatsApp...');
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    target.onerror = null;
+    target.src = `https://placehold.co/600x400/2EC4B6/white?text=DejiOlanike+Farm`;
   };
 
   const navLinks = [
@@ -182,13 +195,19 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#F4FBF9]">
+      {/* Loading indicator */}
+      {!imagesLoaded && (
+        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-[#2EC4B6] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-[#2EC4B6] flex items-center justify-center">
                 <Fish className="w-5 h-5 text-white" />
@@ -198,7 +217,6 @@ function App() {
               </span>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <button
@@ -217,7 +235,6 @@ function App() {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden p-2 rounded-lg hover:bg-[#2EC4B6]/10 transition-colors"
@@ -227,10 +244,10 @@ function App() {
             </button>
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu - Fixed positioning */}
           {isMenuOpen && (
-            <div className="lg:hidden mt-4 bg-white rounded-xl shadow-lg border border-[#E6F6F2] overflow-hidden">
-              <div className="p-4 space-y-2">
+            <div className="lg:hidden fixed inset-x-0 top-16 bg-white border-t border-[#E6F6F2] shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+              <div className="px-4 py-4 space-y-2">
                 {navLinks.map((link) => (
                   <button
                     key={link.label}
@@ -259,6 +276,7 @@ function App() {
             src="/images/hero_pond.jpg"
             alt="Fresh pond water"
             className="w-full h-full object-cover"
+            onError={handleImageError}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#F4FBF9]/40 via-[#F4FBF9]/60 to-[#F4FBF9]/90" />
         </div>
@@ -326,6 +344,7 @@ function App() {
                   src="/images/about_farm.jpg"
                   alt="Holding a fingerling"
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
@@ -380,6 +399,7 @@ function App() {
                     src={product.image}
                     alt={product.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={handleImageError}
                   />
                 </div>
                 <div className="p-6">
@@ -409,6 +429,7 @@ function App() {
                   src="/images/why_pond.jpg"
                   alt="Farm pond"
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#0B3C3C] flex flex-col items-center justify-center text-white shadow-lg">
@@ -526,6 +547,7 @@ function App() {
                   src="/images/testimonial_fish.jpg"
                   alt="Healthy fingerlings"
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
               </div>
               <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
@@ -567,6 +589,7 @@ function App() {
                   src={image}
                   alt={`Gallery ${i + 1}`}
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B3C3C]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
                   <p className="text-white font-medium p-4">Farm Life</p>
@@ -587,6 +610,7 @@ function App() {
                   src="/images/contact_pond.jpg"
                   alt="Serene farm pond"
                   className="w-full h-full object-cover"
+                  onError={handleImageError}
                 />
               </div>
               <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
