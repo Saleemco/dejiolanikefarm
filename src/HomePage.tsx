@@ -1,10 +1,10 @@
-// src/HomePage.tsx
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import { Menu, X, Droplets, Fish, Phone, Mail, MapPin, ChevronDown, Star, CheckCircle, ArrowRight, MessageCircle, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { ThemeToggle } from './components/ThemeToggle';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -196,25 +196,25 @@ function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F4FBF9]">
+    <div className="min-h-screen bg-background theme-transition">
       {/* Loading indicator */}
       {!imagesLoaded && (
-        <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-[#2EC4B6] border-t-transparent rounded-full animate-spin"></div>
+        <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'
+        isScrolled ? 'bg-card/90 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-[#2EC4B6] flex items-center justify-center">
-                <Fish className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                <Fish className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-bold text-lg lg:text-xl text-[#0B3C3C]">
+              <span className="font-heading font-bold text-lg lg:text-xl text-foreground">
                 DejiOlanike Farm
               </span>
             </div>
@@ -225,7 +225,7 @@ function HomePage() {
                   <button
                     key={link.label}
                     onClick={() => scrollToSection(link.ref)}
-                    className="font-medium text-sm text-[#3A5A5A] hover:text-[#2EC4B6] transition-colors"
+                    className="font-medium text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </button>
@@ -233,15 +233,19 @@ function HomePage() {
                   <Link
                     key={link.label}
                     to={link.path}
-                    className="font-medium text-sm text-[#3A5A5A] hover:text-[#2EC4B6] transition-colors"
+                    className="font-medium text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {link.label}
                   </Link>
                 )
               ))}
+              
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
               <button
                 onClick={() => scrollToSection(contactRef)}
-                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-6 py-2 rounded-xl font-medium transition-colors"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-xl font-medium transition-colors"
               >
                 Order Fingerlings
               </button>
@@ -249,23 +253,23 @@ function HomePage() {
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-[#2EC4B6]/10 transition-colors"
+              className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X className="w-6 h-6 text-[#0B3C3C]" /> : <Menu className="w-6 h-6 text-[#0B3C3C]" />}
+              {isMenuOpen ? <X className="w-6 h-6 text-foreground" /> : <Menu className="w-6 h-6 text-foreground" />}
             </button>
           </div>
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden fixed inset-x-0 top-16 bg-white border-t border-[#E6F6F2] shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
+            <div className="lg:hidden fixed inset-x-0 top-16 bg-card border-t border-border shadow-lg max-h-[calc(100vh-4rem)] overflow-y-auto">
               <div className="px-4 py-4 space-y-2">
                 {navLinks.map((link) => (
                   'ref' in link ? (
                     <button
                       key={link.label}
                       onClick={() => scrollToSection(link.ref)}
-                      className="block w-full text-left px-4 py-3 rounded-lg text-[#3A5A5A] hover:bg-[#E6F6F2] transition-colors"
+                      className="block w-full text-left px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
                     >
                       {link.label}
                     </button>
@@ -274,15 +278,21 @@ function HomePage() {
                       key={link.label}
                       to={link.path}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block w-full text-left px-4 py-3 rounded-lg text-[#3A5A5A] hover:bg-[#E6F6F2] transition-colors"
+                      className="block w-full text-left px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
                     >
                       {link.label}
                     </Link>
                   )
                 ))}
+                
+                {/* Theme Toggle in mobile menu */}
+                <div className="flex justify-center py-2">
+                  <ThemeToggle />
+                </div>
+                
                 <button
                   onClick={() => scrollToSection(contactRef)}
-                  className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-4 py-3 rounded-lg font-medium transition-colors mt-2"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-medium transition-colors mt-2"
                 >
                   Order Fingerlings
                 </button>
@@ -301,40 +311,40 @@ function HomePage() {
             className="w-full h-full object-cover"
             onError={handleImageError}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#F4FBF9]/40 via-[#F4FBF9]/60 to-[#F4FBF9]/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/60 to-background/90" />
         </div>
 
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-          <h1 className="hero-title font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-[#0B3C3C] leading-tight mb-6">
+          <h1 className="hero-title font-heading font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-foreground leading-tight mb-6">
             <span className="inline-block">Fresh</span>{' '}
             <span className="inline-block">&</span>{' '}
             <span className="inline-block">Healthy</span>{' '}
-            <span className="inline-block text-[#2EC4B6]">Catfish</span>{' '}
-            <span className="inline-block text-[#2EC4B6]">Fingerlings</span>{' '}
+            <span className="inline-block text-primary">Catfish</span>{' '}
+            <span className="inline-block text-primary">Fingerlings</span>{' '}
             <span className="inline-block">You</span>{' '}
             <span className="inline-block">Can</span>{' '}
             <span className="inline-block">Trust</span>
           </h1>
-          <p className="hero-subtitle text-lg sm:text-xl text-[#3A5A5A] max-w-2xl mx-auto mb-10">
+          <p className="hero-subtitle text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
             Reliable supply for farmers, businesses, and households—delivered with care.
           </p>
           <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => scrollToSection(contactRef)}
-              className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-[#2EC4B6]/25 transition-colors"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-xl text-lg font-semibold shadow-lg shadow-primary/25 transition-colors"
             >
               Order Fingerlings
             </button>
             <button
               onClick={() => scrollToSection(contactRef)}
-              className="border-2 border-[#0B3C3C] text-[#0B3C3C] hover:bg-[#0B3C3C] hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-colors"
+              className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 rounded-xl text-lg font-semibold transition-colors"
             >
               Contact Us
             </button>
           </div>
         </div>
 
-        <div className="scroll-hint absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#3A5A5A]">
+        <div className="scroll-hint absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground">
           <span className="text-sm font-medium">Scroll to explore</span>
           <ChevronDown className="w-5 h-5" />
         </div>
@@ -345,18 +355,18 @@ function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="about-animate order-2 lg:order-1">
-              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">About Us</span>
-              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
+              <span className="font-label font-semibold text-sm tracking-wider text-primary uppercase">About Us</span>
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4 mb-6">
                 We raise strong fingerlings with care and clean water.
               </h2>
-              <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                 DejiOlanike Farm is a family-run aquaculture business focused on healthy stock, consistent supply, and practical guidance for every customer.
               </p>
               <ul className="space-y-4">
                 {['Hatchery-bred for vigor', 'Fast-growing, disease-resistant stock', 'Support for first-time farmers'].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#2EC4B6] flex-shrink-0" />
-                    <span className="text-[#0B3C3C] font-medium">{item}</span>
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -370,8 +380,8 @@ function HomePage() {
                   onError={handleImageError}
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
-                <span className="font-bold text-3xl lg:text-4xl">10K+</span>
+              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full bg-primary flex flex-col items-center justify-center text-primary-foreground shadow-lg animate-float">
+                <span className="font-heading font-bold text-3xl lg:text-4xl">10K+</span>
                 <span className="text-sm font-medium text-center px-2">Fingerlings supplied</span>
               </div>
             </div>
@@ -380,16 +390,16 @@ function HomePage() {
       </section>
 
       {/* Products Section */}
-      <section ref={productsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
+      <section ref={productsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-secondary">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="product-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Our Products</span>
-            <h2 className="product-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
+            <span className="product-animate font-label font-semibold text-sm tracking-wider text-primary uppercase">Our Products</span>
+            <h2 className="product-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4 mb-4">
               Everything you need to start or restock your farm.
             </h2>
             <Link 
               to="/products"
-              className="product-animate inline-flex items-center gap-2 text-[#2EC4B6] font-semibold hover:gap-3 transition-all"
+              className="product-animate inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all"
             >
               View full catalog <ArrowRight className="w-4 h-4" />
             </Link>
@@ -415,7 +425,7 @@ function HomePage() {
             ].map((product, i) => (
               <div
                 key={i}
-                className="product-animate group bg-white rounded-[28px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                className="product-animate group bg-card rounded-[28px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
                 <div className="h-56 overflow-hidden">
                   <img
@@ -426,11 +436,11 @@ function HomePage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-bold text-xl text-[#0B3C3C] mb-2">{product.title}</h3>
-                  <p className="text-[#3A5A5A] mb-4">{product.description}</p>
+                  <h3 className="font-heading font-bold text-xl text-foreground mb-2">{product.title}</h3>
+                  <p className="text-muted-foreground mb-4">{product.description}</p>
                   <button
                     onClick={() => handleQuickInquiry(product.title)}
-                    className="w-full border-2 border-[#2EC4B6] text-[#2EC4B6] hover:bg-[#2EC4B6] hover:text-white px-4 py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
+                    className="w-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
                   >
                     <Send className="w-4 h-4" />
                     Inquire on WhatsApp
@@ -455,17 +465,17 @@ function HomePage() {
                   onError={handleImageError}
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#0B3C3C] flex flex-col items-center justify-center text-white shadow-lg">
-                <span className="font-bold text-3xl lg:text-4xl">100%</span>
+              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-foreground flex flex-col items-center justify-center text-background shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+                <span className="font-heading font-bold text-3xl lg:text-4xl">100%</span>
                 <span className="text-sm font-medium text-center px-2">Healthy Stock Guarantee</span>
               </div>
             </div>
             <div className="why-animate">
-              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Why Choose Us</span>
-              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-6">
+              <span className="font-label font-semibold text-sm tracking-wider text-primary uppercase">Why Choose Us</span>
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4 mb-6">
                 Healthy stock. Honest service. Reliable delivery.
               </h2>
-              <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                 We combine hatchery expertise with on-the-ground support—so you grow with confidence.
               </p>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -475,11 +485,11 @@ function HomePage() {
                   'Flexible order sizes',
                   'Guidance for new farmers',
                 ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm">
-                    <div className="w-8 h-8 rounded-full bg-[#2EC4B6]/10 flex items-center justify-center flex-shrink-0">
-                      <CheckCircle className="w-4 h-4 text-[#2EC4B6]" />
+                  <div key={i} className="flex items-center gap-3 bg-card p-4 rounded-xl shadow-sm">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 text-primary" />
                     </div>
-                    <span className="text-[#0B3C3C] font-medium text-sm">{item}</span>
+                    <span className="text-foreground font-medium text-sm">{item}</span>
                   </div>
                 ))}
               </div>
@@ -489,11 +499,11 @@ function HomePage() {
       </section>
 
       {/* How to Order Section */}
-      <section ref={stepsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
+      <section ref={stepsRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-secondary">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="step-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">How to Order</span>
-            <h2 className="step-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
+            <span className="step-animate font-label font-semibold text-sm tracking-wider text-primary uppercase">How to Order</span>
+            <h2 className="step-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4">
               Get quality fingerlings in three simple steps.
             </h2>
           </div>
@@ -521,17 +531,17 @@ function HomePage() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="step-animate relative bg-white rounded-[28px] p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
+                className="step-animate relative bg-card rounded-[28px] p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group"
               >
-                <div className="absolute top-4 right-4 text-8xl font-bold text-[#2EC4B6]/10 leading-none">
+                <div className="absolute top-4 right-4 text-8xl font-heading font-bold text-primary/10 leading-none">
                   {item.step}
                 </div>
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-[#2EC4B6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <item.icon className="w-7 h-7 text-white" />
+                  <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <item.icon className="w-7 h-7 text-primary-foreground" />
                   </div>
-                  <h3 className="font-bold text-xl text-[#0B3C3C] mb-3">{item.title}</h3>
-                  <p className="text-[#3A5A5A]">{item.description}</p>
+                  <h3 className="font-heading font-bold text-xl text-foreground mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -544,22 +554,22 @@ function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="testimonial-animate">
-              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Testimonials</span>
-              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-8">
+              <span className="font-label font-semibold text-sm tracking-wider text-primary uppercase">Testimonials</span>
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4 mb-8">
                 Farmers trust us because the results speak.
               </h2>
-              <div className="bg-white rounded-[28px] p-8 shadow-lg relative">
-                <div className="text-[#2EC4B6] text-6xl font-serif leading-none mb-4">"</div>
-                <p className="text-[#3A5A5A] text-lg leading-relaxed mb-6">
+              <div className="bg-card rounded-[28px] p-8 shadow-lg relative">
+                <div className="text-primary text-6xl font-serif leading-none mb-4">"</div>
+                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
                   DejiOlanike delivered active, healthy fingerlings and walked me through stocking. Mortality was minimal, and growth has been excellent.
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#E6F6F2] flex items-center justify-center">
-                    <span className="font-bold text-[#2EC4B6]">A</span>
+                  <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+                    <span className="font-heading font-bold text-primary">A</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-[#0B3C3C]">A satisfied customer</p>
-                    <p className="text-sm text-[#3A5A5A]">Fish Farmer, Lagos</p>
+                    <p className="font-semibold text-foreground">A satisfied customer</p>
+                    <p className="text-sm text-muted-foreground">Fish Farmer, Lagos</p>
                   </div>
                 </div>
               </div>
@@ -573,10 +583,10 @@ function HomePage() {
                   onError={handleImageError}
                 />
               </div>
-              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
+              <div className="absolute -bottom-6 -left-6 lg:-left-12 w-32 h-32 lg:w-36 lg:h-36 rounded-full bg-primary flex flex-col items-center justify-center text-primary-foreground shadow-lg animate-float" style={{ animationDelay: '0.5s' }}>
                 <div className="flex items-center gap-1">
                   <Star className="w-5 h-5 fill-current" />
-                  <span className="font-bold text-2xl lg:text-3xl">4.9</span>
+                  <span className="font-heading font-bold text-2xl lg:text-3xl">4.9</span>
                 </div>
                 <span className="text-sm font-medium">Average rating</span>
               </div>
@@ -586,11 +596,11 @@ function HomePage() {
       </section>
 
       {/* Gallery Section */}
-      <section ref={galleryRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-[#E6F6F2]">
+      <section ref={galleryRef} className="py-20 lg:py-28 px-4 sm:px-6 lg:px-8 bg-secondary">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="gallery-animate font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Gallery</span>
-            <h2 className="gallery-animate font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4">
+            <span className="gallery-animate font-label font-semibold text-sm tracking-wider text-primary uppercase">Gallery</span>
+            <h2 className="gallery-animate font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4">
               A look at life on the farm.
             </h2>
           </div>
@@ -614,8 +624,8 @@ function HomePage() {
                   className="w-full h-full object-cover"
                   onError={handleImageError}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B3C3C]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <p className="text-white font-medium p-4">Farm Life</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
+                  <p className="text-background font-medium p-4">Farm Life</p>
                 </div>
               </div>
             ))}
@@ -636,17 +646,17 @@ function HomePage() {
                   onError={handleImageError}
                 />
               </div>
-              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-[#2EC4B6] flex flex-col items-center justify-center text-white shadow-lg">
+              <div className="absolute -bottom-6 -right-6 lg:-right-12 w-36 h-36 lg:w-44 lg:h-44 rounded-full bg-primary flex flex-col items-center justify-center text-primary-foreground shadow-lg animate-float" style={{ animationDelay: '1.5s' }}>
                 <MessageCircle className="w-8 h-8 mb-1" />
-                <span className="font-bold text-lg">Quick Response</span>
+                <span className="font-heading font-bold text-lg">Quick Response</span>
               </div>
             </div>
             <div className="contact-animate">
-              <span className="font-semibold text-sm tracking-wider text-[#2EC4B6] uppercase">Contact Us</span>
-              <h2 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-[#0B3C3C] mt-4 mb-4">
+              <span className="font-label font-semibold text-sm tracking-wider text-primary uppercase">Contact Us</span>
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground mt-4 mb-4">
                 Let's talk fish.
               </h2>
-              <p className="text-[#3A5A5A] text-lg leading-relaxed mb-8">
+              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                 Ask about availability, pricing, or farm support. We reply quickly on WhatsApp.
               </p>
 
@@ -657,7 +667,7 @@ function HomePage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Your Name *"
-                    className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                    className="w-full bg-card border border-input rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   />
                   <input
@@ -666,7 +676,7 @@ function HomePage() {
                     onChange={handleInputChange}
                     type="tel"
                     placeholder="Phone Number *"
-                    className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                    className="w-full bg-card border border-input rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     required
                   />
                 </div>
@@ -676,7 +686,7 @@ function HomePage() {
                   onChange={handleInputChange}
                   type="email"
                   placeholder="Email Address (optional)"
-                  className="w-full bg-white border border-[#E6F6F2] rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                  className="w-full bg-card border border-input rounded-xl h-12 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
                 <textarea
                   name="message"
@@ -684,13 +694,13 @@ function HomePage() {
                   onChange={handleInputChange}
                   placeholder="Your Message *"
                   rows={4}
-                  className="w-full bg-white border border-[#E6F6F2] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent resize-none"
+                  className="w-full bg-card border border-input rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                   required
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-xl h-14 text-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-14 text-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {isSubmitting ? (
                     <>Processing...</>
@@ -713,17 +723,17 @@ function HomePage() {
                 </button>
               </div>
 
-              <div className="mt-8 pt-8 border-t border-[#E6F6F2] space-y-3">
-                <div className="flex items-center gap-3 text-[#3A5A5A]">
-                  <MapPin className="w-5 h-5 text-[#2EC4B6]" />
+              <div className="mt-8 pt-8 border-t border-border space-y-3">
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <MapPin className="w-5 h-5 text-primary" />
                   <span>Lagos, Nigeria</span>
                 </div>
-                <div className="flex items-center gap-3 text-[#3A5A5A]">
-                  <Mail className="w-5 h-5 text-[#2EC4B6]" />
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Mail className="w-5 h-5 text-primary" />
                   <span>saleemahmad2504@email.com</span>
                 </div>
-                <div className="flex items-center gap-3 text-[#3A5A5A]">
-                  <Phone className="w-5 h-5 text-[#2EC4B6]" />
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Phone className="w-5 h-5 text-primary" />
                   <span>+234 XXX XXX XXXX</span>
                 </div>
               </div>
@@ -733,31 +743,31 @@ function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-4 sm:px-6 lg:px-8 bg-[#0B3C3C]">
+      <footer className="py-16 px-4 sm:px-6 lg:px-8 bg-foreground text-background">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-            <div>
+            <div className="lg:col-span-1">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-full bg-[#2EC4B6] flex items-center justify-center">
-                  <Fish className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                  <Fish className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <span className="font-bold text-xl text-white">
+                <span className="font-heading font-bold text-xl text-background">
                   DejiOlanike Farm
                 </span>
               </div>
-              <p className="text-[#E6F6F2]/80 leading-relaxed">
+              <p className="text-background/80 leading-relaxed">
                 Quality fingerlings. Practical support. Lasting growth.
               </p>
             </div>
 
             <div>
-              <h4 className="font-bold text-white mb-4">Products</h4>
+              <h4 className="font-heading font-bold text-background mb-4">Products</h4>
               <ul className="space-y-2">
                 {['Fingerlings', 'Table-size Fish', 'Supplies'].map((item) => (
                   <li key={item}>
                     <button
                       onClick={() => handleQuickInquiry(item)}
-                      className="text-[#E6F6F2]/80 hover:text-[#2EC4B6] transition-colors"
+                      className="text-background/80 hover:text-primary transition-colors"
                     >
                       {item}
                     </button>
@@ -767,7 +777,7 @@ function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-bold text-white mb-4">Company</h4>
+              <h4 className="font-heading font-bold text-background mb-4">Company</h4>
               <ul className="space-y-2">
                 {['About', 'Gallery', 'Contact'].map((item) => (
                   <li key={item}>
@@ -777,7 +787,7 @@ function HomePage() {
                         if (item === 'Gallery') scrollToSection(galleryRef);
                         if (item === 'Contact') scrollToSection(contactRef);
                       }}
-                      className="text-[#E6F6F2]/80 hover:text-[#2EC4B6] transition-colors"
+                      className="text-background/80 hover:text-primary transition-colors"
                     >
                       {item}
                     </button>
@@ -787,11 +797,11 @@ function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-bold text-white mb-4">Get Started</h4>
-              <p className="text-[#E6F6F2]/80 mb-4">Ready to order quality fingerlings?</p>
+              <h4 className="font-heading font-bold text-background mb-4">Get Started</h4>
+              <p className="text-background/80 mb-4">Ready to order quality fingerlings?</p>
               <button
                 onClick={() => handleQuickInquiry('fingerlings order')}
-                className="bg-[#2EC4B6] hover:bg-[#25A99C] text-white px-6 py-3 rounded-xl flex items-center gap-2 transition-colors"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl flex items-center gap-2 transition-colors"
               >
                 <Send className="w-4 h-4" />
                 Order on WhatsApp
@@ -799,8 +809,8 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-[#E6F6F2]/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-[#E6F6F2]/60 text-sm">
+          <div className="pt-8 border-t border-background/20 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-background/60 text-sm">
               © 2026 DejiOlanike Farm. All rights reserved.
             </p>
             <div className="flex gap-4">
@@ -808,7 +818,7 @@ function HomePage() {
                 <button
                   key={social}
                   onClick={() => social === 'WhatsApp' && handleQuickInquiry('connect on social media')}
-                  className="text-[#E6F6F2]/60 hover:text-[#2EC4B6] text-sm transition-colors"
+                  className="text-background/60 hover:text-primary text-sm transition-colors"
                 >
                   {social}
                 </button>

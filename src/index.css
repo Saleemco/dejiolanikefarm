@@ -27,6 +27,28 @@
     --ring: 174 62% 47%;
     --radius: 0.875rem;
   }
+
+  .dark {
+    --background: 180 50% 8%;
+    --foreground: 160 35% 93%;
+    --card: 180 40% 10%;
+    --card-foreground: 160 35% 93%;
+    --popover: 180 40% 10%;
+    --popover-foreground: 160 35% 93%;
+    --primary: 174 62% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 30% 15%;
+    --secondary-foreground: 160 35% 93%;
+    --muted: 180 30% 15%;
+    --muted-foreground: 160 25% 70%;
+    --accent: 174 62% 47%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 180 30% 20%;
+    --input: 180 30% 20%;
+    --ring: 174 62% 47%;
+  }
 }
 
 @layer base {
@@ -39,6 +61,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Nunito', sans-serif;
@@ -59,9 +82,18 @@
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* Dark mode transition utility */
+  .theme-transition {
+    transition: background-color 0.3s ease, 
+                border-color 0.3s ease, 
+                color 0.3s ease, 
+                fill 0.3s ease, 
+                stroke 0.3s ease;
+  }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - now theme-aware */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -104,4 +136,36 @@
 
 .animate-pulse-soft {
   animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Dark mode specific adjustments */
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+.dark img {
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.dark img:hover {
+  opacity: 1;
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+
+/* Disable transitions for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

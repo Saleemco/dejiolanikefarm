@@ -1,18 +1,17 @@
-// src/ProductsPage.tsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Fish, Droplets, Send, ArrowLeft, Search, Filter, 
-  ChevronDown, Grid3X3, List, Star, Package, Truck,
-  Shield, Leaf, TrendingUp, Award, Clock, RefreshCw
+  ChevronDown, Grid3X3, List, Star, Package, TrendingUp, Award
 } from 'lucide-react';
+import { ThemeToggle } from './components/ThemeToggle';
 
 // Product data with 30 items
 const ALL_PRODUCTS = [
   // Fingerlings Category (1-10)
   {
     id: 1,
-    image: '/images/product_fingerlings.jpg',
+    image: 'https://images.unsplash.com/photo-1520333789090-1afc82db536a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Clarias Gariepinus Fingerlings',
     description: 'High-quality African Catfish fingerlings, 3-5cm, active and disease-resistant.',
     category: 'fingerlings',
@@ -27,7 +26,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 2,
-    image: '/images/product_fingerlings_2.jpg',
+    image: 'https://images.unsplash.com/photo-1544552323-bccd25a6af3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Heterobranchus Fingerlings',
     description: 'Hybrid catfish fingerlings, known for faster growth and higher survival rate.',
     category: 'fingerlings',
@@ -42,7 +41,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 3,
-    image: '/images/product_fingerlings_3.jpg',
+    image: 'https://images.unsplash.com/photo-1575428652377-a2d80c2277fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Juvenile Catfish (5-7cm)',
     description: 'Larger juveniles, perfect for farmers who want to skip the nursery phase.',
     category: 'fingerlings',
@@ -57,7 +56,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 4,
-    image: '/images/product_fingerlings_4.jpg',
+    image: 'https://images.unsplash.com/photo-1598392373252-b57a6f564e44?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Juvenile Catfish (8-10cm)',
     description: 'Well-developed juveniles with high survival rate in grow-out ponds.',
     category: 'fingerlings',
@@ -72,7 +71,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 5,
-    image: '/images/product_fingerlings_5.jpg',
+    image: 'https://images.unsplash.com/photo-1601571663856-2d6c9d761a4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Select Breeder Fingerlings',
     description: 'Specially selected fingerlings for breeding programs.',
     category: 'fingerlings',
@@ -87,7 +86,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 6,
-    image: '/images/product_fingerlings_6.jpg',
+    image: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Clarias Fingerlings (Mixed Sex)',
     description: 'Standard mixed-sex fingerlings for table fish production.',
     category: 'fingerlings',
@@ -102,7 +101,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 7,
-    image: '/images/product_fingerlings_7.jpg',
+    image: 'https://images.unsplash.com/photo-1524704796725-9fc3044c58df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'All-Male Fingerlings',
     description: 'Genetically improved all-male fingerlings for uniform growth.',
     category: 'fingerlings',
@@ -117,7 +116,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 8,
-    image: '/images/product_fingerlings_8.jpg',
+    image: 'https://images.unsplash.com/photo-1535591273668-578e31182c4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Grow-Out Juveniles (12-15cm)',
     description: 'Nearly table-size juveniles for quick harvest in 4-6 weeks.',
     category: 'fingerlings',
@@ -132,7 +131,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 9,
-    image: '/images/product_fingerlings_9.jpg',
+    image: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Nursery-Ready Fry',
     description: 'Freshly hatched fry, ideal for nursery pond stocking.',
     category: 'fingerlings',
@@ -147,7 +146,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 10,
-    image: '/images/product_fingerlings_10.jpg',
+    image: 'https://images.unsplash.com/photo-1566400340619-1f9fe2fba285?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Premium Broodstock',
     description: 'Select broodstock for hatchery operations, disease-free and vigorous.',
     category: 'fingerlings',
@@ -164,7 +163,7 @@ const ALL_PRODUCTS = [
   // Table-Size Fish (11-18)
   {
     id: 11,
-    image: '/images/product_tablesize.jpg',
+    image: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Table-Size Catfish (1-1.5kg)',
     description: 'Fresh, live catfish perfect for restaurants and households.',
     category: 'table-size',
@@ -179,7 +178,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 12,
-    image: '/images/product_tablesize_2.jpg',
+    image: 'https://images.unsplash.com/photo-1624546529227-24d2f5d14b6f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Table-Size Catfish (1.5-2kg)',
     description: 'Larger table fish, ideal for processing and smoking.',
     category: 'table-size',
@@ -194,7 +193,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 13,
-    image: '/images/product_tablesize_3.jpg',
+    image: 'https://images.unsplash.com/photo-1580476262798-bddd9f4b7369?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Premium Jumbo Catfish (2-3kg)',
     description: 'Jumbo-sized catfish for special orders and events.',
     category: 'table-size',
@@ -209,7 +208,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 14,
-    image: '/images/product_tablesize_4.jpg',
+    image: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Mixed-Size Table Fish',
     description: 'Assorted sizes (1-2.5kg) at a discounted bulk rate.',
     category: 'table-size',
@@ -224,7 +223,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 15,
-    image: '/images/product_tablesize_5.jpg',
+    image: 'https://images.unsplash.com/photo-1629709305580-5a833dc72d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Smoked Catfish (Whole)',
     description: 'Hot-smoked catfish, ready to eat, vacuum-packed.',
     category: 'table-size',
@@ -239,7 +238,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 16,
-    image: '/images/product_tablesize_6.jpg',
+    image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Catfish Fillets (Fresh)',
     description: 'Skinless, boneless catfish fillets, vacuum-sealed.',
     category: 'table-size',
@@ -254,7 +253,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 17,
-    image: '/images/product_tablesize_7.jpg',
+    image: 'https://images.unsplash.com/photo-1613146001037-7b5fbe4c8ec5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Frozen Catfish (Whole)',
     description: 'Individually quick-frozen whole catfish, vacuum-packed.',
     category: 'table-size',
@@ -269,7 +268,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 18,
-    image: '/images/product_tablesize_8.jpg',
+    image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Catfish Steaks',
     description: 'Fresh-cut catfish steaks, perfect for grilling.',
     category: 'table-size',
@@ -286,7 +285,7 @@ const ALL_PRODUCTS = [
   // Farming Supplies (19-25)
   {
     id: 19,
-    image: '/images/product_supplies.jpg',
+    image: 'https://images.unsplash.com/photo-1597764690523-15bea4c581c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Floating Fish Feed (2mm)',
     description: 'High-protein floating pellets for fingerlings and juveniles.',
     category: 'supplies',
@@ -301,7 +300,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 20,
-    image: '/images/product_supplies_2.jpg',
+    image: 'https://images.unsplash.com/photo-1597764690523-15bea4c581c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Floating Fish Feed (4mm)',
     description: 'Grower feed for table-size fish, optimal protein balance.',
     category: 'supplies',
@@ -316,7 +315,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 21,
-    image: '/images/product_supplies_3.jpg',
+    image: 'https://images.unsplash.com/photo-1597764690523-15bea4c581c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Floating Fish Feed (6mm)',
     description: 'Finisher feed for harvest-ready fish.',
     category: 'supplies',
@@ -331,7 +330,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 22,
-    image: '/images/product_supplies_4.jpg',
+    image: 'https://images.unsplash.com/photo-1597764690523-15bea4c581c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Sinking Fish Feed',
     description: 'Sinking pellets for bottom feeders and catfish.',
     category: 'supplies',
@@ -346,7 +345,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 23,
-    image: '/images/product_supplies_5.jpg',
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Water Test Kit',
     description: 'Complete kit for testing pH, ammonia, nitrite, and nitrate.',
     category: 'supplies',
@@ -361,7 +360,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 24,
-    image: '/images/product_supplies_6.jpg',
+    image: 'https://images.unsplash.com/photo-1536981783625-20072640a3f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Pond Aerator (1HP)',
     description: 'Heavy-duty pond aerator for optimal oxygen levels.',
     category: 'supplies',
@@ -376,7 +375,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 25,
-    image: '/images/product_supplies_7.jpg',
+    image: 'https://images.unsplash.com/photo-1621451537084-4820c9f70702?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Nylon Fishing Net',
     description: 'Durable nylon net for harvesting, 2-inch mesh.',
     category: 'supplies',
@@ -393,7 +392,7 @@ const ALL_PRODUCTS = [
   // Special Offers & Services (26-30)
   {
     id: 26,
-    image: '/images/product_service_1.jpg',
+    image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Farm Setup Consultation',
     description: 'On-site consultation for new fish farmers, includes pond design and stocking plan.',
     category: 'services',
@@ -408,7 +407,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 27,
-    image: '/images/product_service_2.jpg',
+    image: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Water Quality Testing',
     description: 'Professional water quality analysis with recommendations.',
     category: 'services',
@@ -423,7 +422,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 28,
-    image: '/images/product_bundle_1.jpg',
+    image: 'https://images.unsplash.com/photo-1575428652377-a2d80c2277fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Starter Farm Bundle',
     description: 'Everything to start: 500 fingerlings + 2 bags feed + water test kit.',
     category: 'bundles',
@@ -438,7 +437,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 29,
-    image: '/images/product_bundle_2.jpg',
+    image: 'https://images.unsplash.com/photo-1601571663856-2d6c9d761a4b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Grower Farm Bundle',
     description: '300 juveniles + 3 bags grower feed + aeration stone.',
     category: 'bundles',
@@ -453,7 +452,7 @@ const ALL_PRODUCTS = [
   },
   {
     id: 30,
-    image: '/images/product_bundle_3.jpg',
+    image: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     title: 'Harvest Season Special',
     description: 'Bulk purchase of mixed-size table fish at special pricing.',
     category: 'specials',
@@ -480,7 +479,7 @@ const CATEGORIES = [
 ];
 
 function ProductsPage() {
-  const [products, setProducts] = useState(ALL_PRODUCTS);
+  const [products] = useState(ALL_PRODUCTS);
   const [filteredProducts, setFilteredProducts] = useState(ALL_PRODUCTS);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -557,26 +556,29 @@ function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4FBF9]">
+    <div className="min-h-screen bg-background theme-transition">
       {/* Header */}
-      <div className="bg-white border-b border-[#E6F6F2] sticky top-0 z-40">
+      <div className="bg-card border-b border-border sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link 
                 to="/" 
-                className="flex items-center gap-2 text-[#0B3C3C] hover:text-[#2EC4B6] transition-colors"
+                className="flex items-center gap-2 text-foreground hover:text-primary transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back to Home</span>
               </Link>
-              <h1 className="text-2xl font-bold text-[#0B3C3C]">Our Products</h1>
+              <h1 className="font-heading text-2xl font-bold text-foreground">Our Products</h1>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid' ? 'bg-[#2EC4B6] text-white' : 'bg-[#E6F6F2] text-[#3A5A5A]'
+                  viewMode === 'grid' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                 }`}
               >
                 <Grid3X3 className="w-5 h-5" />
@@ -584,7 +586,9 @@ function ProductsPage() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list' ? 'bg-[#2EC4B6] text-white' : 'bg-[#E6F6F2] text-[#3A5A5A]'
+                  viewMode === 'list' 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                 }`}
               >
                 <List className="w-5 h-5" />
@@ -599,12 +603,12 @@ function ProductsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
+            <div className="bg-card rounded-xl shadow-sm p-6 sticky top-24">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-semibold text-[#0B3C3C]">Filters</h2>
+                <h2 className="font-heading font-semibold text-foreground">Filters</h2>
                 <button 
                   onClick={() => setShowFilters(!showFilters)}
-                  className="lg:hidden text-[#2EC4B6]"
+                  className="lg:hidden text-primary"
                 >
                   <Filter className="w-5 h-5" />
                 </button>
@@ -613,7 +617,7 @@ function ProductsPage() {
               <div className={`space-y-6 ${showFilters ? 'block' : 'hidden lg:block'}`}>
                 {/* Categories */}
                 <div>
-                  <h3 className="font-medium text-[#0B3C3C] mb-3">Categories</h3>
+                  <h3 className="font-medium text-foreground mb-3">Categories</h3>
                   <div className="space-y-2">
                     {CATEGORIES.map((category) => (
                       <button
@@ -621,8 +625,8 @@ function ProductsPage() {
                         onClick={() => setSelectedCategory(category.id)}
                         className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-colors ${
                           selectedCategory === category.id
-                            ? 'bg-[#2EC4B6] text-white'
-                            : 'text-[#3A5A5A] hover:bg-[#E6F6F2]'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-secondary'
                         }`}
                       >
                         <category.icon className="w-4 h-4" />
@@ -634,7 +638,7 @@ function ProductsPage() {
 
                 {/* Price Range */}
                 <div>
-                  <h3 className="font-medium text-[#0B3C3C] mb-3">Price Range</h3>
+                  <h3 className="font-medium text-foreground mb-3">Price Range</h3>
                   <div className="space-y-2">
                     <input
                       type="range"
@@ -643,9 +647,9 @@ function ProductsPage() {
                       step="1000"
                       value={priceRange.max}
                       onChange={(e) => setPriceRange({ ...priceRange, max: parseInt(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-primary"
                     />
-                    <div className="flex justify-between text-sm text-[#3A5A5A]">
+                    <div className="flex justify-between text-sm text-muted-foreground">
                       <span>₦0</span>
                       <span>₦{priceRange.max.toLocaleString()}</span>
                     </div>
@@ -659,9 +663,9 @@ function ProductsPage() {
                       type="checkbox"
                       checked={inStockOnly}
                       onChange={(e) => setInStockOnly(e.target.checked)}
-                      className="rounded border-[#E6F6F2] text-[#2EC4B6] focus:ring-[#2EC4B6]"
+                      className="rounded border-border text-primary focus:ring-primary"
                     />
-                    <span className="text-sm text-[#3A5A5A]">Show in stock only</span>
+                    <span className="text-sm text-muted-foreground">Show in stock only</span>
                   </label>
                 </div>
 
@@ -674,7 +678,7 @@ function ProductsPage() {
                     setPriceRange({ min: 0, max: 100000 });
                     setInStockOnly(false);
                   }}
-                  className="w-full px-4 py-2 border border-[#E6F6F2] rounded-lg text-sm text-[#3A5A5A] hover:bg-[#E6F6F2] transition-colors"
+                  className="w-full px-4 py-2 border border-border rounded-lg text-sm text-muted-foreground hover:bg-secondary transition-colors"
                 >
                   Clear All Filters
                 </button>
@@ -685,22 +689,22 @@ function ProductsPage() {
           {/* Products Grid */}
           <div className="flex-1">
             {/* Search and Sort Bar */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div className="bg-card rounded-xl shadow-sm p-4 mb-6">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#3A5A5A]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-[#E6F6F2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                 </div>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border border-[#E6F6F2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2EC4B6] focus:border-transparent"
+                  className="px-4 py-2 bg-background border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value="featured">Featured</option>
                   <option value="price-low">Price: Low to High</option>
@@ -712,7 +716,7 @@ function ProductsPage() {
             </div>
 
             {/* Results Count */}
-            <div className="mb-4 text-sm text-[#3A5A5A]">
+            <div className="mb-4 text-sm text-muted-foreground">
               Showing {filteredProducts.length} of {products.length} products
             </div>
 
@@ -722,7 +726,7 @@ function ProductsPage() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                   >
                     <div className="relative h-48 overflow-hidden">
                       <img
@@ -731,14 +735,14 @@ function ProductsPage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       {!product.inStock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
+                          <span className="bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-sm font-medium">
                             Out of Stock
                           </span>
                         </div>
                       )}
                       {product.rating >= 4.8 && (
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-950 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
                           <Star className="w-3 h-3 fill-current" />
                           {product.rating}
                         </div>
@@ -746,30 +750,30 @@ function ProductsPage() {
                     </div>
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-[#0B3C3C]">{product.title}</h3>
-                        <product.icon className="w-5 h-5 text-[#2EC4B6]" />
+                        <h3 className="font-heading font-semibold text-foreground">{product.title}</h3>
+                        <product.icon className="w-5 h-5 text-primary" />
                       </div>
-                      <p className="text-sm text-[#3A5A5A] mb-3 line-clamp-2">{product.description}</p>
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{product.description}</p>
                       <div className="flex flex-wrap gap-1 mb-3">
                         {product.tags.map((tag, i) => (
-                          <span key={i} className="text-xs bg-[#E6F6F2] text-[#0B3C3C] px-2 py-1 rounded-full">
+                          <span key={i} className="text-xs bg-secondary text-foreground px-2 py-1 rounded-full">
                             {tag}
                           </span>
                         ))}
                       </div>
                       <div className="flex items-end justify-between">
                         <div>
-                          <p className="text-lg font-bold text-[#0B3C3C]">{product.price}</p>
-                          <p className="text-xs text-[#3A5A5A]">{product.priceUnit}</p>
-                          <p className="text-xs text-[#3A5A5A] mt-1">Min: {product.minOrder}</p>
+                          <p className="text-lg font-bold text-foreground">{product.price}</p>
+                          <p className="text-xs text-muted-foreground">{product.priceUnit}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Min: {product.minOrder}</p>
                         </div>
                         <button
                           onClick={() => handleQuickInquiry(product.title)}
                           disabled={!product.inStock}
                           className={`px-3 py-2 rounded-lg text-sm flex items-center gap-1 transition-colors ${
                             product.inStock
-                              ? 'bg-[#2EC4B6] hover:bg-[#25A99C] text-white'
-                              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                              ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                              : 'bg-muted text-muted-foreground cursor-not-allowed'
                           }`}
                         >
                           <Send className="w-4 h-4" />
@@ -785,7 +789,7 @@ function ProductsPage() {
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row"
+                    className="bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row"
                   >
                     <div className="md:w-48 h-48 md:h-auto relative">
                       <img
@@ -794,8 +798,8 @@ function ProductsPage() {
                         className="w-full h-full object-cover"
                       />
                       {!product.inStock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                        <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
+                          <span className="bg-destructive text-destructive-foreground px-3 py-1 rounded-full text-sm font-medium">
                             Out of Stock
                           </span>
                         </div>
@@ -804,37 +808,37 @@ function ProductsPage() {
                     <div className="flex-1 p-6">
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <h3 className="font-semibold text-[#0B3C3C] text-lg">{product.title}</h3>
+                          <h3 className="font-heading font-semibold text-foreground text-lg">{product.title}</h3>
                           <div className="flex items-center gap-2 mt-1">
                             <div className="flex items-center gap-1">
                               <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                              <span className="text-sm font-medium">{product.rating}</span>
+                              <span className="text-sm font-medium text-foreground">{product.rating}</span>
                             </div>
-                            <span className="text-sm text-[#3A5A5A]">({product.reviews} reviews)</span>
+                            <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
                           </div>
                         </div>
-                        <product.icon className="w-6 h-6 text-[#2EC4B6]" />
+                        <product.icon className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-[#3A5A5A] mb-4">{product.description}</p>
+                      <p className="text-muted-foreground mb-4">{product.description}</p>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {product.tags.map((tag, i) => (
-                          <span key={i} className="text-xs bg-[#E6F6F2] text-[#0B3C3C] px-3 py-1 rounded-full">
+                          <span key={i} className="text-xs bg-secondary text-foreground px-3 py-1 rounded-full">
                             {tag}
                           </span>
                         ))}
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-2xl font-bold text-[#0B3C3C]">{product.price}</p>
-                          <p className="text-sm text-[#3A5A5A]">{product.priceUnit} • Min: {product.minOrder}</p>
+                          <p className="text-2xl font-bold text-foreground">{product.price}</p>
+                          <p className="text-sm text-muted-foreground">{product.priceUnit} • Min: {product.minOrder}</p>
                         </div>
                         <button
                           onClick={() => handleQuickInquiry(product.title)}
                           disabled={!product.inStock}
                           className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-colors ${
                             product.inStock
-                              ? 'bg-[#2EC4B6] hover:bg-[#25A99C] text-white'
-                              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                              ? 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                              : 'bg-muted text-muted-foreground cursor-not-allowed'
                           }`}
                         >
                           <Send className="w-4 h-4" />
@@ -849,10 +853,10 @@ function ProductsPage() {
 
             {/* No Results */}
             {filteredProducts.length === 0 && (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                <Package className="w-16 h-16 text-[#2EC4B6] mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#0B3C3C] mb-2">No Products Found</h3>
-                <p className="text-[#3A5A5A] mb-4">Try adjusting your filters or search query.</p>
+              <div className="bg-card rounded-xl shadow-sm p-12 text-center">
+                <Package className="w-16 h-16 text-primary mx-auto mb-4" />
+                <h3 className="font-heading text-xl font-semibold text-foreground mb-2">No Products Found</h3>
+                <p className="text-muted-foreground mb-4">Try adjusting your filters or search query.</p>
                 <button
                   onClick={() => {
                     setSelectedCategory('all');
@@ -861,7 +865,7 @@ function ProductsPage() {
                     setPriceRange({ min: 0, max: 100000 });
                     setInStockOnly(false);
                   }}
-                  className="px-6 py-2 bg-[#2EC4B6] hover:bg-[#25A99C] text-white rounded-lg transition-colors"
+                  className="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors"
                 >
                   Clear All Filters
                 </button>
@@ -872,9 +876,9 @@ function ProductsPage() {
       </div>
 
       {/* Footer */}
-      <footer className="mt-16 py-8 px-4 sm:px-6 lg:px-8 bg-white border-t border-[#E6F6F2]">
+      <footer className="mt-16 py-8 px-4 sm:px-6 lg:px-8 bg-card border-t border-border">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-[#3A5A5A] text-sm">
+          <p className="text-muted-foreground text-sm">
             © 2026 DejiOlanike Farm. All rights reserved.
           </p>
         </div>
