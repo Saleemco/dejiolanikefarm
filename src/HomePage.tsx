@@ -1,20 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link } from 'react-router-dom';
 import { Menu, X, Droplets, Fish, Phone, Mail, MapPin, ChevronDown, Star, CheckCircle, ArrowRight, MessageCircle, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { ThemeToggle } from './components/ThemeToggle';
+import { useProducts } from './hooks/useProducts';
+import { urlFor } from './sanity';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const WHATSAPP_NUMBER = '+2348012345678'; // Replace with your actual number
+const WHATSAPP_NUMBER = '+2348109598706'; 
 
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
+  
+  const { products, loading, error } = useProducts(3);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -59,6 +64,17 @@ function HomePage() {
     });
   }, []);
 
+  // When images are loaded and products are loaded, show content
+  useEffect(() => {
+    if (imagesLoaded && !loading) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        setContentReady(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [imagesLoaded, loading]);
+
   // Scroll effect
   useEffect(() => {
     const handleScroll = () => {
@@ -68,9 +84,9 @@ function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animations
+  // Animations - only run when content is ready
   useEffect(() => {
-    if (!imagesLoaded) return;
+    if (!contentReady) return;
 
     // Hero animation
     const heroTl = gsap.timeline({ delay: 0.3 });
@@ -121,7 +137,7 @@ function HomePage() {
     return () => {
       ScrollTrigger.getAll().forEach(st => st.kill());
     };
-  }, [imagesLoaded]);
+  }, [contentReady]);
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -195,15 +211,13 @@ function HomePage() {
     { label: 'Contact', ref: contactRef },
   ];
 
+  // Don't show anything while loading - let App.tsx loader handle it
+  if (!contentReady) {
+    return null; // Return nothing, App.tsx loader will show
+  }
+
   return (
     <div className="min-h-screen bg-background theme-transition">
-      {/* Loading indicator */}
-      {!imagesLoaded && (
-        <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      )}
-
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-card/90 backdrop-blur-md shadow-sm py-2' : 'bg-transparent py-4'
@@ -240,7 +254,6 @@ function HomePage() {
                 )
               ))}
               
-              {/* Theme Toggle */}
               <ThemeToggle />
               
               <button
@@ -269,6 +282,7 @@ function HomePage() {
                     <button
                       key={link.label}
                       onClick={() => scrollToSection(link.ref)}
+                      onClick={() => setIsMenuOpen(false)}
                       className="block w-full text-left px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
                     >
                       {link.label}
@@ -285,7 +299,6 @@ function HomePage() {
                   )
                 ))}
                 
-                {/* Theme Toggle in mobile menu */}
                 <div className="flex justify-center py-2">
                   <ThemeToggle />
                 </div>
@@ -405,50 +418,70 @@ function HomePage() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                image: '/images/product_fingerlings.jpg',
-                title: 'Catfish Fingerlings',
-                description: 'Strong, active juveniles ready for pond stocking.',
-              },
-              {
-                image: '/images/product_tablesize.jpg',
-                title: 'Table-Size Catfish',
-                description: 'Fresh, mature fish for markets and kitchens.',
-              },
-              {
-                image: '/images/product_supplies.jpg',
-                title: 'Farming Supplies',
-                description: 'Feeds, water tools, and practical guidance.',
-              },
-            ].map((product, i) => (
-              <div
-                key={i}
-                className="product-animate group bg-card rounded-[28px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
-              >
-                <div className="h-56 overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={handleImageError}
-                  />
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-pulse text-muted-foreground">Loading products...</div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12 text-red-500">
+              Error loading products. Please refresh.
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <div
+                  key={product._id}
+                  className="product-animate group bg-card rounded-[28px] overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                >
+                  <div className="h-56 overflow-hidden">
+                    {(() => {
+                      try {
+                        if (product.mainImage) {
+                          return (
+                            <img
+                              src={urlFor(product.mainImage).width(400).height(300).url()}
+                              alt={product.mainImage.alt || product.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              onError={handleImageError}
+                            />
+                          );
+                        } else {
+                          return (
+                            <div className="w-full h-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                              <Fish className="w-16 h-16 text-primary-foreground opacity-50" />
+                            </div>
+                          );
+                        }
+                      } catch (e) {
+                        return (
+                          <div className="w-full h-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                            <Fish className="w-16 h-16 text-primary-foreground opacity-50" />
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-heading font-bold text-xl text-foreground mb-2">{product.title}</h3>
+                    <p className="text-muted-foreground mb-4">{product.description}</p>
+                    {product.price && (
+                      <p className="text-primary font-bold text-xl mb-4">
+                        ₦{product.price.toLocaleString()} 
+                        <span className="text-sm font-normal text-muted-foreground ml-1">/{product.unit || 'unit'}</span>
+                      </p>
+                    )}
+                    <button
+                      onClick={() => handleQuickInquiry(product.title)}
+                      className="w-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Send className="w-4 h-4" />
+                      Inquire on WhatsApp
+                    </button>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-heading font-bold text-xl text-foreground mb-2">{product.title}</h3>
-                  <p className="text-muted-foreground mb-4">{product.description}</p>
-                  <button
-                    onClick={() => handleQuickInquiry(product.title)}
-                    className="w-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-4 py-2 rounded-xl transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Send className="w-4 h-4" />
-                    Inquire on WhatsApp
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
