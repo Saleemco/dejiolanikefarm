@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './components/ThemeProvider';
 import HomePage from './HomePage';
 import ProductsPage from './ProductsPage';
+import AdminPage from './AdminPage';
 import { Fish } from 'lucide-react';
 
-function AppLoader() {
+// Create a wrapper component that uses hooks
+function AppContent() {
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
+    // Only show loader on homepage
+    if (location.pathname !== '/') {
+      setIsLoading(false);
+      return;
+    }
+
     // Listen for when HomePage signals it's ready
     const handleHomePageReady = () => {
       setIsLoading(false);
@@ -25,9 +34,10 @@ function AppLoader() {
       window.removeEventListener('homepageReady', handleHomePageReady);
       clearTimeout(timer);
     };
-  }, []);
+  }, [location.pathname]);
 
-  if (isLoading) {
+  // Show loader only on homepage
+  if (isLoading && location.pathname === '/') {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -60,19 +70,22 @@ function AppLoader() {
   }
 
   return (
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/admin" element={<AdminPage />} />
+    </Routes>
   );
 }
 
 function App() {
-  return <AppLoader />;
+  return (
+    <ThemeProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </ThemeProvider>
+  );
 }
 
 export default App;

@@ -10,7 +10,7 @@ import { urlFor } from './sanity';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const WHATSAPP_NUMBER = '+2348109598706'; 
+const WHATSAPP_NUMBER = '+2348023699850'; 
 
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,6 +74,16 @@ function HomePage() {
       return () => clearTimeout(timer);
     }
   }, [imagesLoaded, loading]);
+
+  // When content is ready, tell App.tsx to hide the loader
+  useEffect(() => {
+    if (contentReady) {
+      // Small delay to ensure everything is rendered
+      setTimeout(() => {
+        window.dispatchEvent(new Event('homepageReady'));
+      }, 100);
+    }
+  }, [contentReady]);
 
   // Scroll effect
   useEffect(() => {
@@ -281,8 +291,10 @@ function HomePage() {
                   'ref' in link ? (
                     <button
                       key={link.label}
-                      onClick={() => scrollToSection(link.ref)}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={() => {
+                        scrollToSection(link.ref);
+                        setIsMenuOpen(false);
+                      }}
                       className="block w-full text-left px-4 py-3 rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
                     >
                       {link.label}
@@ -304,7 +316,10 @@ function HomePage() {
                 </div>
                 
                 <button
-                  onClick={() => scrollToSection(contactRef)}
+                  onClick={() => {
+                    scrollToSection(contactRef);
+                    setIsMenuOpen(false);
+                  }}
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-3 rounded-lg font-medium transition-colors mt-2"
                 >
                   Order Fingerlings
@@ -763,11 +778,11 @@ function HomePage() {
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Mail className="w-5 h-5 text-primary" />
-                  <span>saleemahmad2504@email.com</span>
+                  <span>dejiolanikefarm@email.com</span>
                 </div>
                 <div className="flex items-center gap-3 text-muted-foreground">
                   <Phone className="w-5 h-5 text-primary" />
-                  <span>+234 XXX XXX XXXX</span>
+                  <span>+234 8023699850</span>
                 </div>
               </div>
             </div>

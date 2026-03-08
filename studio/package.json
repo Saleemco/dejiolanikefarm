@@ -4,13 +4,14 @@
   "version": "1.0.0",
   "main": "package.json",
   "license": "UNLICENSED",
-  "scripts": {
-    "dev": "sanity dev",
-    "start": "sanity start",
-    "build": "sanity build",
-    "deploy": "sanity deploy",
-    "deploy-graphql": "sanity graphql deploy"
-  },
+ "scripts": {
+  "dev": "vite",
+  "build": "node ./node_modules/vite/bin/vite.js build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "add-product": "tsx scripts/addProduct.ts",
+  "import-products": "tsx scripts/batchImport.ts"
+},
   "keywords": [
     "sanity"
   ],
